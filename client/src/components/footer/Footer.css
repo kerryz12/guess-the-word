@@ -1,0 +1,23 @@
+.footer-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  padding: 2rem;
+}
+
+.footer-heading {
+  width: 100%;
+  text-align: center;
+}
+
+.footer-heading p {
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15px;
+
+  margin: 0 1rem;
+}
