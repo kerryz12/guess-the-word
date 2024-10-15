@@ -1,21 +1,22 @@
 {
-    "compilerOptions": {
-      "target": "ES6",
-      "module": "commonjs",
-      "outDir": "./dist",
-      "rootDir": "./src",
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "typeRoots": ["./node_modules/@types", "./src/types"]
-    },
-
-    /* Linting */
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["node", "express", "dotenv"],
+    "typeRoots": ["./node_modules/@types", "./src/types"]
+  },
 
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules"]
-  }
+  /* Linting */
+  "strict": true,
+  "noUnusedLocals": true,
+  "noUnusedParameters": true,
+  "noFallthroughCasesInSwitch": true,
+
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

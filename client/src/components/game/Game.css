@@ -48,3 +48,9 @@
 .card-content {
   font-size: 1.1rem;
 }
+
+.guess-word-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}

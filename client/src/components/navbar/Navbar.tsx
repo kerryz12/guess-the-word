@@ -10,9 +10,7 @@ function Navbar() {
           </p>
         </div>
         <div className="navbar-links_container">
-          <p>
-            <a href="/about">about</a>
-          </p>
+          <p>about</p>
         </div>
       </div>
     </div>
