@@ -5,7 +5,6 @@ import {
   MessageSquare,
   Send,
   MessageCircleQuestion,
-  MessageCircle,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -36,7 +35,7 @@ const Game = () => {
   const handleQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/ask", {
+      const response = await fetch("/api/ask", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,7 +55,7 @@ const Game = () => {
   const handleGuessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/guess", {
+      const response = await fetch("/api/guess", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +66,7 @@ const Game = () => {
       if (data.correct) {
         setAnswer("Congratulations! You guessed the word correctly!");
         setIsGameOver(true);
-        const wordResponse = await fetch("http://localhost:3000/getword");
+        const wordResponse = await fetch("/api/getword");
         const wordData = await wordResponse.json();
         setSolvedWord(wordData);
 
@@ -144,28 +143,27 @@ const Game = () => {
 
       <Card className="my-6">
         <CardHeader>
-          <CardTitle className="card-title">Response</CardTitle>
+          <CardTitle className="card-title">Ask Questions!</CardTitle>
         </CardHeader>
         <CardContent className="card-content">
           <p>{answer}</p>
         </CardContent>
+        <form onSubmit={handleQuestionSubmit} className="form-container">
+          <div className="ask-question-container">
+            <Input
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask a yes/no question..."
+              className="input-field"
+              disabled={isGameOver}
+            />
+            <Button type="submit" className="button" disabled={isGameOver}>
+              Ask <MessageCircleQuestion className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+        </form>
       </Card>
-
-      <form onSubmit={handleQuestionSubmit} className="form-container">
-        <div className="ask-question-container">
-          <Input
-            type="text"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask a yes/no question..."
-            className="input-field"
-            disabled={isGameOver}
-          />
-          <Button type="submit" className="button" disabled={isGameOver}>
-            Ask <MessageCircleQuestion className="ml-2 h-5 w-5" />
-          </Button>
-        </div>
-      </form>
     </div>
   );
 };

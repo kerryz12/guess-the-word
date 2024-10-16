@@ -3,6 +3,9 @@ import { Request, Response } from "express";
 import dotenv from "dotenv";
 import axios from "axios";
 import cors from "cors";
+import fs from "fs";
+import path from "path";
+import cron from "node-cron";
 
 dotenv.config();
 
@@ -11,6 +14,8 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
+
+app.use(express.static(path.join(__dirname, "../../client/dist")));
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -23,13 +28,35 @@ interface GroqResponse {
   }>;
 }
 
-let currentWord = "beaver";
+let currentWord = "";
 
-app.get("/getword", async (req: Request, res: Response): Promise<any> => {
+function selectWordForToday(): string {
+  const words = JSON.parse(
+    fs.readFileSync(path.join(__dirname, "words.json"), "utf-8")
+  ).words;
+  const today = new Date();
+  const index =
+    (today.getFullYear() * 366 + today.getMonth() * 31 + today.getDate()) %
+    words.length;
+  return words[index];
+}
+
+function updateCurrentWord() {
+  currentWord = selectWordForToday();
+  console.log(`Word updated to: ${currentWord}`);
+}
+
+updateCurrentWord();
+
+cron.schedule("0 0 * * *", () => {
+  updateCurrentWord();
+});
+
+app.get("/api/getword", async (req: Request, res: Response): Promise<any> => {
   res.json(currentWord);
 });
 
-app.post("/ask", async (req: Request, res: Response): Promise<any> => {
+app.post("/api/ask", async (req: Request, res: Response): Promise<any> => {
   try {
     const { question } = req.body;
 
@@ -76,7 +103,7 @@ app.post("/ask", async (req: Request, res: Response): Promise<any> => {
   }
 });
 
-app.post("/guess", (req: any, res: any) => {
+app.post("/api/guess", (req: any, res: any) => {
   const { guess } = req.body;
 
   if (!guess) {
@@ -88,15 +115,8 @@ app.post("/guess", (req: any, res: any) => {
   res.json({ correct });
 });
 
-app.post("/setword", (req: any, res: any) => {
-  const { word } = req.body;
-
-  if (!word) {
-    return res.status(400).json({ error: "Word is required" });
-  }
-
-  currentWord = word;
-  res.json({ message: "New word set successfully" });
+app.get("*", (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
 });
 
 app.listen(port, () => {
