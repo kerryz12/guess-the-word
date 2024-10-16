@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   FileQuestion,
   Clock,
@@ -24,16 +24,122 @@ const Game = () => {
   const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [shake, setShake] = useState(false);
   const [jump, setJump] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [wins, setWins] = useState(0);
+  const [streak, setStreak] = useState(0);
+
+  const fetchServerDateTime = async () => {
+    try {
+      const response = await fetch("/api/datetime");
+      const data = await response.json();
+      return {
+        currentDate: data.currentDate,
+        serverTime: data.serverTime,
+      };
+    } catch (error) {
+      console.error("Error fetching server date/time:", error);
+      return {
+        currentDate: new Date().toDateString(),
+        serverTime: Math.floor(Date.now() / 1000),
+      };
+    }
+  };
+
+  const resetGame = useCallback(() => {
+    setGuesses(0);
+    setTime(0);
+    setIsGameOver(false);
+    setSolvedWord("");
+    setIsCorrectGuess(false);
+    setAnswer("");
+    localStorage.removeItem("gameState");
+  }, []);
+
+  const saveGameState = useCallback(() => {
+    const gameState = {
+      guesses,
+      time,
+      isGameOver,
+      solvedWord,
+      savedDate: new Date().toDateString(),
+      wins,
+      streak,
+      lastPlayedDate: new Date().toDateString(),
+    };
+    localStorage.setItem("gameState", JSON.stringify(gameState));
+  }, [guesses, time, isGameOver, solvedWord, wins, streak]);
+
+  const loadGameState = useCallback(async () => {
+    const savedState = localStorage.getItem("gameState");
+    if (savedState) {
+      const {
+        guesses,
+        time,
+        isGameOver,
+        solvedWord,
+        savedDate,
+        wins: savedWins,
+        streak: savedStreak,
+        lastPlayedDate,
+      } = JSON.parse(savedState);
+
+      const { currentDate } = await fetchServerDateTime();
+      const yesterday = new Date(currentDate - 86400000).toDateString();
+      setWins(savedWins || 0);
+
+      if (savedDate !== currentDate) {
+        resetGame();
+        await fetchNewWord();
+
+        if (lastPlayedDate === yesterday) {
+          setStreak(savedStreak);
+        } else {
+          setStreak(0);
+        }
+      } else {
+        setGuesses(guesses);
+        setTime(time);
+        setIsGameOver(isGameOver);
+        setSolvedWord(solvedWord);
+        setStreak(savedStreak);
+      }
+    } else {
+      await fetchNewWord();
+    }
+    setIsLoading(false);
+  }, [resetGame]);
+
+  useEffect(() => {
+    loadGameState();
+  }, [loadGameState]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      saveGameState();
+    }
+  }, [isLoading, saveGameState]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (!isGameOver) {
+    if (!isGameOver && !isLoading) {
       timer = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
+        setTime((prevTime) => {
+          const newTime = prevTime + 1;
+          return newTime;
+        });
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [isGameOver]);
+  }, [isGameOver, isLoading]);
+
+  const fetchNewWord = async () => {
+    try {
+      const response = await fetch("/api/getword");
+      await response.json();
+    } catch (error) {
+      console.error("Error fetching new word:", error);
+    }
+  };
 
   const handleQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,14 +175,13 @@ const Game = () => {
       if (data.correct) {
         setAnswer("Congratulations! You guessed the word correctly!");
         setIsGameOver(true);
-        const wordResponse = await fetch("/api/getword");
-        const wordData = await wordResponse.json();
-        setSolvedWord(wordData);
-
+        setSolvedWord(guess);
         setShowConfetti(true);
         setJump(true);
         setIsCorrectGuess(true);
         setGuess("");
+        setWins((prevWins) => prevWins + 1);
+        setStreak((prevStreak) => prevStreak + 1);
         setTimeout(() => setShowConfetti(false), 10000);
         setTimeout(() => setJump(false), 2000);
       } else {
@@ -93,10 +198,8 @@ const Game = () => {
 
   const triggerShake = () => {
     setShake(true);
-
     setTimeout(() => {
       setShake(false);
-
       setGuess("");
     }, 600);
   };

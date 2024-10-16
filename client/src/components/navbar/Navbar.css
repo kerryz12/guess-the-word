@@ -29,6 +29,17 @@
   cursor: pointer;
 }
 
+.navbar-links-logo span {
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 33px;
+
+  margin: 0 1rem;
+  cursor: pointer;
+}
+
 .navbar-links_container p,
 .navbar-sign p,
 .navbar-menu_container p {
@@ -42,18 +53,14 @@
   cursor: pointer;
 }
 
-@media only screen and (min-width: 1600px) {
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-
-    padding: 2rem 2rem;
-    margin-left: 30%;
-    margin-right: 30%;
-  }
+.stats-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-@media only screen and (max-width: 1600px) {
+@media only screen and (min-width: 1650px) {
   .navbar {
     display: flex;
     justify-content: space-between;
@@ -64,7 +71,7 @@
   }
 }
 
-@media only screen and (max-width: 1280px) {
+@media only screen and (max-width: 1650px) {
   .navbar {
     display: flex;
     justify-content: space-between;
@@ -72,5 +79,34 @@
     padding: 2rem 2rem;
     margin-left: 20%;
     margin-right: 20%;
+  }
+}
+
+@media only screen and (max-width: 1400px) {
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+
+    padding: 2rem 2rem;
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+}
+
+@media only screen and (max-width: 1050px) {
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+
+    padding: 2rem 2rem;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .navbar {
+    display: flex;
+    flex-direction: column;
+
+    padding: 2rem 2rem;
   }
 }
