@@ -21,6 +21,9 @@ const Game = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const [solvedWord, setSolvedWord] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
+  const [isCorrectGuess, setIsCorrectGuess] = useState(false);
+  const [shake, setShake] = useState(false);
+  const [jump, setJump] = useState(false);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -71,16 +74,31 @@ const Game = () => {
         setSolvedWord(wordData);
 
         setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 8000);
+        setJump(true);
+        setIsCorrectGuess(true);
+        setGuess("");
+        setTimeout(() => setShowConfetti(false), 10000);
+        setTimeout(() => setJump(false), 2000);
       } else {
         setAnswer("Sorry, that's not the correct word. Keep guessing!");
+        setIsCorrectGuess(false);
+        triggerShake();
       }
       setGuesses((prevGuesses) => prevGuesses + 1);
-      setGuess("");
     } catch (error) {
       console.error("Error:", error);
       setAnswer("An error occurred while processing your guess");
     }
+  };
+
+  const triggerShake = () => {
+    setShake(true);
+
+    setTimeout(() => {
+      setShake(false);
+
+      setGuess("");
+    }, 600);
   };
 
   const formatTime = (seconds: number) => {
@@ -120,8 +138,15 @@ const Game = () => {
           <FileQuestion className="h-6 w-6 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="mystery-word">
-            {isGameOver ? solvedWord : "?????"}
+          <div
+            className={`mystery-word ${shake ? "shake" : ""} ${
+              jump ? "jump" : ""
+            }`}
+            style={{
+              color: isGameOver ? "green" : isCorrectGuess ? "green" : "",
+            }}
+          >
+            {isGameOver ? solvedWord : guess || "?????"}
           </div>
           <form onSubmit={handleGuessSubmit} className="form-container mt-4">
             <div className="guess-word-container">
@@ -143,7 +168,7 @@ const Game = () => {
 
       <Card className="my-6">
         <CardHeader>
-          <CardTitle className="card-title">Ask Questions!</CardTitle>
+          <CardTitle className="card-title">Ask Questions</CardTitle>
         </CardHeader>
         <CardContent className="card-content">
           <p>{answer}</p>
