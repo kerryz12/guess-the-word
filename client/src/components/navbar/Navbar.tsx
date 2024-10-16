@@ -31,9 +31,9 @@ function Navbar() {
                   to figure out what it is.
                   <Separator className="my-4" />
                   You could try guessing what it is right away, but the odds of
-                  getting it would be pretty unlikely. Instead, you can ask Yes
-                  or No questions to try to obtain information about the word
-                  and narrow down the possibilties.
+                  getting it would be pretty unlikely. Instead, you can also ask
+                  Yes or No questions to try to obtain information about the
+                  word, and narrow down the possibilties.
                   <Separator className="my-4" />
                   You win the game when you correctly guess the mystery word!
                   For an added challenge, try to do it in as few guesses or in
