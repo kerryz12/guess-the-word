@@ -23,7 +23,11 @@ interface GroqResponse {
   }>;
 }
 
-let currentWord = "example";
+let currentWord = "beaver";
+
+app.get("/getword", async (req: Request, res: Response): Promise<any> => {
+  res.json(currentWord);
+});
 
 app.post("/ask", async (req: Request, res: Response): Promise<any> => {
   try {
@@ -40,7 +44,13 @@ app.post("/ask", async (req: Request, res: Response): Promise<any> => {
         messages: [
           {
             role: "system",
-            content: `You are a helpful assistant for a word guessing game. You must only respond with "Yes", "No", or "I don't know". The current word is [INSERT_WORD_HERE].`,
+            content: `You are a helpful assistant for a word guessing game. 
+                      Every day, a new random word is chosen, and the user can ask you yes or no questions to attempt to narrow down the word. The user's goal is to guess the word. 
+                      You must only respond with "Yes", "No", or "I'm not sure", unless there are multiple definitions for the word 
+                      which raise ambiguities in the answer to the user's question, or unless the question is not a Yes or No question.
+                      In the case that there are ambiguities, please feel free to respond with a short, single sentence providing any assumptions
+                      in the answer you provide the user. In the case the user does not ask a yes or no question, please respond by telling the
+                      user that they should only ask Yes or No questions. The current word is ${currentWord}.`,
           },
           { role: "user", content: question },
         ],
@@ -78,7 +88,7 @@ app.post("/guess", (req: any, res: any) => {
   res.json({ correct });
 });
 
-app.post("/set-word", (req: any, res: any) => {
+app.post("/setword", (req: any, res: any) => {
   const { word } = req.body;
 
   if (!word) {

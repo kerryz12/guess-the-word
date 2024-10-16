@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { FileQuestion, Clock, MessageSquare, Send } from "lucide-react";
+import {
+  FileQuestion,
+  Clock,
+  MessageSquare,
+  Send,
+  MessageCircleQuestion,
+  MessageCircle,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Confetti from "react-confetti";
 import "./Game.css";
 
 const Game = () => {
@@ -12,14 +20,18 @@ const Game = () => {
   const [guesses, setGuesses] = useState(0);
   const [time, setTime] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [solvedWord, setSolvedWord] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTime((prevTime) => prevTime + 1);
-    }, 1000);
-
+    let timer: NodeJS.Timeout;
+    if (!isGameOver) {
+      timer = setInterval(() => {
+        setTime((prevTime) => prevTime + 1);
+      }, 1000);
+    }
     return () => clearInterval(timer);
-  }, []);
+  }, [isGameOver]);
 
   const handleQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +67,12 @@ const Game = () => {
       if (data.correct) {
         setAnswer("Congratulations! You guessed the word correctly!");
         setIsGameOver(true);
+        const wordResponse = await fetch("http://localhost:3000/getword");
+        const wordData = await wordResponse.json();
+        setSolvedWord(wordData);
+
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 8000);
       } else {
         setAnswer("Sorry, that's not the correct word. Keep guessing!");
       }
@@ -74,31 +92,7 @@ const Game = () => {
 
   return (
     <div className="game-container">
-      <Card className="mb-6">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="card-title">Mystery Word</CardTitle>
-          <FileQuestion className="h-6 w-6 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="mystery-word">{isGameOver ? "Solved!" : "????"}</div>
-          <form onSubmit={handleGuessSubmit} className="form-container mt-4">
-            <div className="guess-word-container">
-              <Input
-                type="text"
-                value={guess}
-                onChange={(e) => setGuess(e.target.value)}
-                placeholder="Guess the word..."
-                className="input-field"
-                disabled={isGameOver}
-              />
-              <Button type="submit" className="button" disabled={isGameOver}>
-                Guess <Send className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
+      {showConfetti && <Confetti />}
       <div className="card-row">
         <Card className="card-half">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -120,30 +114,58 @@ const Game = () => {
           </CardContent>
         </Card>
       </div>
-      <form onSubmit={handleQuestionSubmit} className="form-container">
-        <Input
-          type="text"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Ask a yes/no question..."
-          className="input-field"
-          disabled={isGameOver}
-        />
-        <Button type="submit" className="button" disabled={isGameOver}>
-          Ask
-        </Button>
-      </form>
 
-      {answer && (
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="card-title">AI Response</CardTitle>
-          </CardHeader>
-          <CardContent className="card-content">
-            <p>{answer}</p>
-          </CardContent>
-        </Card>
-      )}
+      <Card className="mb-6">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle className="card-title">Mystery Word</CardTitle>
+          <FileQuestion className="h-6 w-6 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="mystery-word">
+            {isGameOver ? solvedWord : "?????"}
+          </div>
+          <form onSubmit={handleGuessSubmit} className="form-container mt-4">
+            <div className="guess-word-container">
+              <Input
+                type="text"
+                value={guess}
+                onChange={(e) => setGuess(e.target.value)}
+                placeholder="Guess the word..."
+                className="input-field"
+                disabled={isGameOver}
+              />
+              <Button type="submit" className="button" disabled={isGameOver}>
+                Guess <Send className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card className="my-6">
+        <CardHeader>
+          <CardTitle className="card-title">Response</CardTitle>
+        </CardHeader>
+        <CardContent className="card-content">
+          <p>{answer}</p>
+        </CardContent>
+      </Card>
+
+      <form onSubmit={handleQuestionSubmit} className="form-container">
+        <div className="ask-question-container">
+          <Input
+            type="text"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Ask a yes/no question..."
+            className="input-field"
+            disabled={isGameOver}
+          />
+          <Button type="submit" className="button" disabled={isGameOver}>
+            Ask <MessageCircleQuestion className="ml-2 h-5 w-5" />
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };

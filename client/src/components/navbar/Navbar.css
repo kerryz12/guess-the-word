@@ -42,7 +42,19 @@
   cursor: pointer;
 }
 
-@media only screen and (min-width: 1280px) {
+@media only screen and (min-width: 1600px) {
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 2rem 2rem;
+    margin-left: 30%;
+    margin-right: 30%;
+  }
+}
+
+@media only screen and (max-width: 1600px) {
   .navbar {
     display: flex;
     justify-content: space-between;
@@ -51,5 +63,17 @@
     padding: 2rem 2rem;
     margin-left: 25%;
     margin-right: 25%;
+  }
+}
+
+@media only screen and (max-width: 1280px) {
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 2rem 2rem;
+    margin-left: 20%;
+    margin-right: 20%;
   }
 }
