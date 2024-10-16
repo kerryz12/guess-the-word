@@ -83,7 +83,7 @@ app.post("/api/ask", async (req: Request, res: Response): Promise<any> => {
           {
             role: "system",
             content: `You are a helpful assistant for a word guessing game. The user can ask you yes or no questions to attempt to narrow down the mystery word. The user's goal is to guess the word. 
-                      You must only respond with "Yes", "No", or "I'm not sure", except in the following two cases. In the case that there are ambiguities in the answer to the user's question, such as 
+                      You must only respond with "Yes.", "No.", or "I'm not sure.", except in the following two cases. In the case that there are ambiguities in the answer to the user's question, such as 
                       there being multiple definitions for the word, or such as there being factors that the answer to the user's question depends on, please feel free to respond with a short sentence 
                       providing any assumptions in the answer you provide the user. Do not include the actual word in this response, and try to use generic terms to avoid giving away additional clues.
                       In the case the user does not ask a yes or no question, please respond by telling the user that they can only ask Yes or No questions. The current word is ${currentWord}.`,
