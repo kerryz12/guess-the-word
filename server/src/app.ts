@@ -31,9 +31,12 @@ interface GroqResponse {
 let currentWord = "";
 
 function selectWordForToday(): string {
-  const words = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "words.json"), "utf-8")
-  ).words;
+  const isProduction = process.env.NODE_ENV === "production";
+  const filePath = isProduction
+    ? path.join(__dirname, "../src/words.json")
+    : path.join(__dirname, "words.json");
+
+  const words = JSON.parse(fs.readFileSync(filePath, "utf-8")).words;
   const today = new Date();
   const index =
     (today.getFullYear() * 366 + today.getMonth() * 31 + today.getDate()) %
