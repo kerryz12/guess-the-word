@@ -15,6 +15,7 @@ import "./Navbar.css";
 function Navbar() {
   const [wins, setWins] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [currentDate, setCurrentDate] = useState("");
 
   useEffect(() => {
     const storedGameState = localStorage.getItem("gameState");
@@ -30,13 +31,19 @@ function Navbar() {
         setStreak(gameState.streak);
       }
     }
-  }, []);
 
-  const currentDate = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+    const fetchDate = async () => {
+      try {
+        const response = await fetch("/api/datetime");
+        const data = await response.json();
+        setCurrentDate(data.currentDate);
+      } catch (error) {
+        console.error("Error fetching date:", error);
+      }
+    };
+
+    fetchDate();
+  }, []);
 
   return (
     <div className="navbar">
