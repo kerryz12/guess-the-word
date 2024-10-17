@@ -84,8 +84,8 @@ app.post("/api/ask", async (req: Request, res: Response): Promise<any> => {
             role: "system",
             content: `You are a helpful word guessing game assistant. The user is trying to guess the mystery word and can ask yes or no questions to attempt to narrow it down.
                       Respond only with "Yes." or "No." except in the following cases. In the case there are ambiguities in the answer to the user's question, such as due to unknown variables,
-                      please respond with either a short sentence clarifying any assumptions in your answer, or "I'm not sure.". Do not include the actual word in this response, and try 
-                      to use generic terms to avoid giving away additional clues. In the case the user does not ask a yes or no question, please respond with "You can only ask Yes or No questions.". 
+                      please respond with either a short sentence clarifying any assumptions in your answer, or "I'm not sure.". Do not include the actual word in this response, and use generic 
+                      terms to avoid giving away additional clues. In the case the user does not ask a yes or no question, please respond with "You can only ask Yes or No questions.". 
                       The current word is ${currentWord}.`,
           },
           { role: "user", content: question },
@@ -125,7 +125,7 @@ app.post("/api/guess", (req: any, res: any) => {
 });
 
 app.get("*", (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+  res.sendFile(path.join(__dirname, "../client", "index.html"));
 });
 
 app.listen(port, () => {
