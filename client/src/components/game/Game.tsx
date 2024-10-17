@@ -30,7 +30,9 @@ const Game = () => {
 
   const fetchServerDateTime = async () => {
     try {
-      const response = await fetch("/api/game/datetime");
+      const response = await fetch("/api/game/datetime", {
+        credentials: "include",
+      });
       const data = await response.json();
       return {
         currentDate: data.currentDate,
@@ -135,6 +137,7 @@ const Game = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ question }),
+        credentials: "include",
       });
       const data = await response.json();
       setAnswer(data.answer);
@@ -157,6 +160,7 @@ const Game = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ guess }),
+        credentials: "include",
       });
       const data = await response.json();
       if (data.correct) {
@@ -191,6 +195,7 @@ const Game = () => {
           guesses,
           time,
         }),
+        credentials: "include",
       });
       if (!response.ok) {
         throw new Error("Failed to update user stats");

@@ -79,7 +79,9 @@ function Navbar() {
   useEffect(() => {
     const fetchDate = async () => {
       try {
-        const response = await fetch("/api/game/datetime");
+        const response = await fetch("/api/game/datetime", {
+          credentials: "include",
+        });
         const data = await response.json();
 
         const formattedDate = new Date(data.currentDate).toLocaleDateString(
@@ -109,7 +111,9 @@ function Navbar() {
       }
 
       try {
-        const response = await fetch("/api/stats/user");
+        const response = await fetch("/api/stats/user", {
+          credentials: "include",
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch user stats");
         }
