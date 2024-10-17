@@ -3,7 +3,7 @@ import {
   askQuestion,
   guessWord,
   getDateTime,
-} from "../controllers/wordController";
+} from "../controllers/gameController";
 
 const router = express.Router();
 

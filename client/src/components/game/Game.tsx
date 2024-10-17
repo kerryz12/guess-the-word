@@ -22,18 +22,15 @@ const Game = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const [solvedWord, setSolvedWord] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [shake, setShake] = useState(false);
   const [jump, setJump] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [wins, setWins] = useState(0);
-  const [streak, setStreak] = useState(0);
   const [loadingReply, setLoadingReply] = useState(false);
   const [serverDate, setServerDate] = useState("");
 
   const fetchServerDateTime = async () => {
     try {
-      const response = await fetch("/api/datetime");
+      const response = await fetch("/api/game/datetime");
       const data = await response.json();
       return {
         currentDate: data.currentDate,
@@ -53,7 +50,6 @@ const Game = () => {
     setTime(0);
     setIsGameOver(false);
     setSolvedWord("");
-    setIsCorrectGuess(false);
     setAnswer("");
     localStorage.removeItem("gameState");
   }, []);
@@ -65,52 +61,32 @@ const Game = () => {
       isGameOver,
       solvedWord,
       savedDate: serverDate,
-      wins,
-      streak,
       lastSolvedDate: serverDate,
     };
     localStorage.setItem("gameState", JSON.stringify(gameState));
-  }, [guesses, time, isGameOver, solvedWord, wins, streak]);
+  }, [guesses, time, isGameOver, solvedWord]);
 
   const loadGameState = useCallback(async () => {
     const gameState = localStorage.getItem("gameState");
     const { currentDate } = await fetchServerDateTime();
 
     if (gameState) {
-      const {
-        guesses,
-        time,
-        isGameOver,
-        solvedWord,
-        savedDate,
-        wins: savedWins,
-        streak: savedStreak,
-        lastSolvedDate,
-      } = JSON.parse(gameState);
+      const { guesses, time, isGameOver, solvedWord, savedDate } =
+        JSON.parse(gameState);
 
       const today = new Date(currentDate);
-
       const yesterday = new Date(currentDate);
       yesterday.setDate(yesterday.getDate() - 1);
 
       const lastPlayed = new Date(savedDate);
 
-      setWins(savedWins || 0);
-
       if (today.toDateString() !== lastPlayed.toDateString()) {
         resetGame();
-
-        if (lastSolvedDate === yesterday.toDateString()) {
-          setStreak(savedStreak);
-        } else {
-          setStreak(0);
-        }
       } else {
         setGuesses(guesses);
         setTime(time);
         setIsGameOver(isGameOver);
         setSolvedWord(solvedWord);
-        setStreak(savedStreak);
       }
     }
 
@@ -153,7 +129,7 @@ const Game = () => {
     e.preventDefault();
     setLoadingReply(true);
     try {
-      const response = await fetch("/api/ask", {
+      const response = await fetch("/api/game/ask", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -175,7 +151,7 @@ const Game = () => {
   const handleGuessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/guess", {
+      const response = await fetch("/api/game/guess", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -189,21 +165,38 @@ const Game = () => {
         setSolvedWord(guess);
         setShowConfetti(true);
         setJump(true);
-        setIsCorrectGuess(true);
         setGuess("");
-        setWins((prevWins) => prevWins + 1);
-        setStreak((prevStreak) => prevStreak + 1);
         setTimeout(() => setShowConfetti(false), 10000);
         setTimeout(() => setJump(false), 2000);
+        updateUserStats(guesses + 1);
       } else {
         setAnswer("Sorry, that's not the correct word. Keep guessing!");
-        setIsCorrectGuess(false);
         triggerShake();
       }
       setGuesses((prevGuesses) => prevGuesses + 1);
     } catch (error) {
       console.error("Error:", error);
       setAnswer("An error occurred while processing your guess");
+    }
+  };
+
+  const updateUserStats = async (guesses: number) => {
+    try {
+      const response = await fetch("/api/stats/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          guesses,
+          time,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update user stats");
+      }
+    } catch (error) {
+      console.error("Error updating user stats:", error);
     }
   };
 
@@ -257,7 +250,7 @@ const Game = () => {
               jump ? "jump" : ""
             }`}
             style={{
-              color: isGameOver ? "green" : isCorrectGuess ? "green" : "",
+              color: isGameOver ? "green" : "",
             }}
           >
             {isGameOver ? solvedWord : guess || "?"}

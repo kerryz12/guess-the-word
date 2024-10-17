@@ -5,7 +5,7 @@ import { createRegularUser } from "../models/user";
 export const signup = async (req: any, res: any) => {
   try {
     const { username, email, displayName, password } = req.body;
-    if (!username || !email || !displayName || !password) {
+    if (!username || !email || !password) {
       return res.status(400).json({ error: "All fields are required" });
     }
     const newUser = await createRegularUser(

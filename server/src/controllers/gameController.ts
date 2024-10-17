@@ -10,7 +10,7 @@ let currentWord = "";
 function selectWordForToday(): string {
   const isProduction = process.env.NODE_ENV === "production";
   const filePath = isProduction
-    ? path.join(__dirname, "../src/words.json")
+    ? path.join(__dirname, "../../src/words.json")
     : path.join(__dirname, "../words.json");
 
   const words = JSON.parse(fs.readFileSync(filePath, "utf-8")).words;
@@ -51,11 +51,11 @@ export const askQuestion = async (
         messages: [
           {
             role: "system",
-            content: `You are a helpful word guessing game assistant. The user is trying to guess the mystery word and can ask yes or no questions to attempt to narrow it down.
+            content: `You are a helpful word guessing game assistant. The user is trying narrow down the mystery word by asking yes or no questions.
                       Respond only with "Yes." or "No." except in the following cases. In the case there are ambiguities in the answer to the user's question, such as due to unknown variables,
                       please respond with either a short sentence clarifying any assumptions in your answer, or "I'm not sure.". Do not include the actual word in this response, and use generic 
                       terms to avoid giving away additional clues. In the case the user does not ask a yes or no question, please respond with "You can only ask Yes or No questions.". 
-                      The current word is ${currentWord}.`,
+                      The mystery word is ${currentWord}.`,
           },
           { role: "user", content: question },
         ],

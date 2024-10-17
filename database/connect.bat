@@ -1,0 +1,1 @@
+psql -h aws-0-us-west-1.pooler.supabase.com -U postgres.nkxknhzncawjjxddpfhi -d postgres -p 6543
