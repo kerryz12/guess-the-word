@@ -78,7 +78,7 @@ app.post("/api/ask", async (req: Request, res: Response): Promise<any> => {
     const groqResponse = await axios.post<GroqResponse>(
       GROQ_API_URL,
       {
-        model: "llama-3.1-70b-versatile",
+        model: "llama-3.2-90b-text-preview",
         messages: [
           {
             role: "system",
