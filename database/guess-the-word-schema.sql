@@ -21,6 +21,34 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: completions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.completions (
+    user_id character varying(255),
+    guesses integer,
+    "time" interval,
+    date timestamp without time zone
+);
+
+
+ALTER TABLE public.completions OWNER TO postgres;
+
+--
+-- Name: stats; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.stats (
+    user_id character varying(255),
+    wins integer,
+    streak integer,
+    max_streak integer
+);
+
+
+ALTER TABLE public.stats OWNER TO postgres;
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 

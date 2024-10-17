@@ -122,7 +122,9 @@ function Navbar() {
             </DialogHeader>
           </DialogContent>
         </Dialog>
-        <p>log in</p>
+        <p>
+          <a href="/login">log in</a>
+        </p>
       </div>
     </div>
   );
