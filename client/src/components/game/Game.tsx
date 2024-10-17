@@ -260,7 +260,7 @@ const Game = () => {
               color: isGameOver ? "green" : isCorrectGuess ? "green" : "",
             }}
           >
-            {isGameOver ? solvedWord : guess || "?????"}
+            {isGameOver ? solvedWord : guess || "?"}
           </div>
           <form onSubmit={handleGuessSubmit} className="form-container mt-4">
             <div className="guess-word-container">
@@ -297,7 +297,7 @@ const Game = () => {
               placeholder="Ask a yes/no question..."
               className="input-field"
               disabled={isGameOver}
-              maxLength={96}
+              maxLength={64}
             />
             <Button type="submit" className="button" disabled={isGameOver}>
               Ask <MessageCircleQuestion className="ml-2 h-5 w-5" />
