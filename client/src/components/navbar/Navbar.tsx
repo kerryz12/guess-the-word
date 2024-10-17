@@ -36,7 +36,17 @@ function Navbar() {
       try {
         const response = await fetch("/api/datetime");
         const data = await response.json();
-        setCurrentDate(data.currentDate);
+
+        const formattedDate = new Date(data.currentDate).toLocaleDateString(
+          "en-US",
+          {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }
+        );
+
+        setCurrentDate(formattedDate);
       } catch (error) {
         console.error("Error fetching date:", error);
       }
