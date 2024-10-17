@@ -57,23 +57,26 @@ const Game = () => {
     localStorage.removeItem("gameState");
   }, []);
 
-  const saveGameState = useCallback(() => {
+  const saveGameState = useCallback(async () => {
+    const { currentDate } = await fetchServerDateTime();
     const gameState = {
       guesses,
       time,
       isGameOver,
       solvedWord,
-      savedDate: new Date().toDateString(),
+      savedDate: currentDate,
       wins,
       streak,
-      lastPlayedDate: new Date().toDateString(),
+      lastSolvedDate: currentDate,
     };
     localStorage.setItem("gameState", JSON.stringify(gameState));
   }, [guesses, time, isGameOver, solvedWord, wins, streak]);
 
   const loadGameState = useCallback(async () => {
-    const savedState = localStorage.getItem("gameState");
-    if (savedState) {
+    const gameState = localStorage.getItem("gameState");
+    const { currentDate } = await fetchServerDateTime();
+
+    if (gameState) {
       const {
         guesses,
         time,
@@ -82,18 +85,23 @@ const Game = () => {
         savedDate,
         wins: savedWins,
         streak: savedStreak,
-        lastPlayedDate,
-      } = JSON.parse(savedState);
+        lastSolvedDate,
+      } = JSON.parse(gameState);
 
-      const { currentDate } = await fetchServerDateTime();
-      const yesterday = new Date(currentDate - 86400000).toDateString();
+      const today = new Date(currentDate);
+
+      const yesterday = new Date(currentDate);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const lastPlayed = new Date(savedDate);
+
       setWins(savedWins || 0);
 
-      if (savedDate !== currentDate) {
+      if (today.toDateString() !== lastPlayed.toDateString()) {
         resetGame();
         await fetchNewWord();
 
-        if (lastPlayedDate === yesterday) {
+        if (lastSolvedDate === yesterday.toDateString()) {
           setStreak(savedStreak);
         } else {
           setStreak(0);
@@ -108,6 +116,7 @@ const Game = () => {
     } else {
       await fetchNewWord();
     }
+
     setIsLoading(false);
   }, [resetGame]);
 
