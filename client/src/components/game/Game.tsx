@@ -29,6 +29,7 @@ const Game = () => {
   const [wins, setWins] = useState(0);
   const [streak, setStreak] = useState(0);
   const [loadingReply, setLoadingReply] = useState(false);
+  const [serverDate, setServerDate] = useState("");
 
   const fetchServerDateTime = async () => {
     try {
@@ -58,16 +59,15 @@ const Game = () => {
   }, []);
 
   const saveGameState = useCallback(async () => {
-    const { currentDate } = await fetchServerDateTime();
     const gameState = {
       guesses,
       time,
       isGameOver,
       solvedWord,
-      savedDate: currentDate,
+      savedDate: serverDate,
       wins,
       streak,
-      lastSolvedDate: currentDate,
+      lastSolvedDate: serverDate,
     };
     localStorage.setItem("gameState", JSON.stringify(gameState));
   }, [guesses, time, isGameOver, solvedWord, wins, streak]);
@@ -99,7 +99,6 @@ const Game = () => {
 
       if (today.toDateString() !== lastPlayed.toDateString()) {
         resetGame();
-        await fetchNewWord();
 
         if (lastSolvedDate === yesterday.toDateString()) {
           setStreak(savedStreak);
@@ -113,8 +112,6 @@ const Game = () => {
         setSolvedWord(solvedWord);
         setStreak(savedStreak);
       }
-    } else {
-      await fetchNewWord();
     }
 
     setIsLoading(false);
@@ -143,14 +140,14 @@ const Game = () => {
     return () => clearInterval(timer);
   }, [isGameOver, isLoading]);
 
-  const fetchNewWord = async () => {
-    try {
-      const response = await fetch("/api/getword");
-      await response.json();
-    } catch (error) {
-      console.error("Error fetching new word:", error);
-    }
-  };
+  useEffect(() => {
+    const getServerDate = async () => {
+      const { currentDate } = await fetchServerDateTime();
+      setServerDate(currentDate);
+    };
+
+    getServerDate();
+  }, []);
 
   const handleQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
