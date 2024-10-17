@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Confetti from "react-confetti";
+import { Loader } from "..";
 import "./Game.css";
 
 const Game = () => {
@@ -27,6 +28,7 @@ const Game = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [wins, setWins] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [loadingReply, setLoadingReply] = useState(false);
 
   const fetchServerDateTime = async () => {
     try {
@@ -143,6 +145,7 @@ const Game = () => {
 
   const handleQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoadingReply(true);
     try {
       const response = await fetch("/api/ask", {
         method: "POST",
@@ -158,6 +161,8 @@ const Game = () => {
     } catch (error) {
       console.error("Error:", error);
       setAnswer("An error occurred while processing your request");
+    } finally {
+      setLoadingReply(false);
     }
   };
 
@@ -260,6 +265,7 @@ const Game = () => {
                 placeholder="Guess the word..."
                 className="input-field"
                 disabled={isGameOver}
+                maxLength={16}
               />
               <Button type="submit" className="button" disabled={isGameOver}>
                 Guess <Send className="ml-2 h-5 w-5" />
@@ -274,7 +280,7 @@ const Game = () => {
           <CardTitle className="card-title">Ask Questions</CardTitle>
         </CardHeader>
         <CardContent className="card-content">
-          <p>{answer}</p>
+          {loadingReply ? <Loader /> : <p>{answer}</p>}
         </CardContent>
         <form onSubmit={handleQuestionSubmit} className="form-container">
           <div className="ask-question-container">
@@ -285,6 +291,7 @@ const Game = () => {
               placeholder="Ask a yes/no question..."
               className="input-field"
               disabled={isGameOver}
+              maxLength={96}
             />
             <Button type="submit" className="button" disabled={isGameOver}>
               Ask <MessageCircleQuestion className="ml-2 h-5 w-5" />

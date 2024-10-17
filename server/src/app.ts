@@ -90,7 +90,7 @@ app.post("/api/ask", async (req: Request, res: Response): Promise<any> => {
           },
           { role: "user", content: question },
         ],
-        max_tokens: 10,
+        max_tokens: 20,
         temperature: 0.7,
       },
       {
