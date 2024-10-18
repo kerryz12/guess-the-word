@@ -257,7 +257,7 @@ function Navbar() {
                   onClick={() => redirectUser(`/auth/logout`)}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Logout</span>
+                  <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>

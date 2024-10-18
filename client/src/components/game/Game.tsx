@@ -71,6 +71,7 @@ const Game = () => {
   const loadGameState = useCallback(async () => {
     const gameState = localStorage.getItem("gameState");
     const { currentDate } = await fetchServerDateTime();
+    setServerDate(currentDate);
 
     if (gameState) {
       const { guesses, time, isGameOver, solvedWord, savedDate } =
@@ -117,15 +118,6 @@ const Game = () => {
     }
     return () => clearInterval(timer);
   }, [isGameOver, isLoading]);
-
-  useEffect(() => {
-    const getServerDate = async () => {
-      const { currentDate } = await fetchServerDateTime();
-      setServerDate(currentDate);
-    };
-
-    getServerDate();
-  }, []);
 
   const handleQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
