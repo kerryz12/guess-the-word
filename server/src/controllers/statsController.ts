@@ -17,7 +17,7 @@ export const updateUserStats = async (req: any, res: any) => {
       const todayCompletionCheck = await client.query(
         `SELECT * FROM completions 
          WHERE user_id = $1 
-         AND DATE(date) = CURRENT_DATE`,
+         AND DATE(date AT TIME ZONE 'UTC') = CURRENT_DATE AT TIME ZONE 'UTC'`,
         [user_id]
       );
 
@@ -30,16 +30,16 @@ export const updateUserStats = async (req: any, res: any) => {
 
         await client.query(
           `INSERT INTO stats (user_id, wins, streak, last_played)
-           VALUES ($1, 1, 1, NOW())
+           VALUES ($1, 1, 1, NOW() AT TIME ZONE 'UTC')
            ON CONFLICT (user_id)
            DO UPDATE SET
              wins = stats.wins + 1,
              streak = CASE
-               WHEN DATE(stats.last_played) = (CURRENT_DATE - INTERVAL '1 day')
+               WHEN DATE(stats.last_played AT TIME ZONE 'UTC') = (CURRENT_DATE AT TIME ZONE 'UTC' - INTERVAL '1 day')
                THEN stats.streak + 1
                ELSE 1
              END,
-             last_played = NOW()
+             last_played = NOW() AT TIME ZONE 'UTC'
            RETURNING *`,
           [user_id]
         );
@@ -109,7 +109,7 @@ export const getTodayLeaderboard = async (req: any, res: any) => {
       JOIN 
         users u ON c.user_id = u.google_id
       WHERE 
-        DATE(c.date) = CURRENT_DATE
+        DATE(c.date AT TIME ZONE 'UTC') = CURRENT_DATE AT TIME ZONE 'UTC'
       ORDER BY 
         c.guesses ASC, 
         c.time ASC
