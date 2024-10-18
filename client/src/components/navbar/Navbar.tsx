@@ -160,6 +160,10 @@ function Navbar() {
                 an added challenge, try to do it in as few guesses or in as
                 little time as possible.
                 <Separator className="my-4" />
+                We're using generative AI to respond to your questions, so try
+                to make sure they're as clear as possible so that it can
+                understand properly!
+                <Separator className="my-4" />
                 The mystery word changes every day at 00:00 UTC.
               </DialogDescription>
             </DialogHeader>

@@ -21,9 +21,38 @@ function selectWordForToday(): string {
   return words[index];
 }
 
+function getWordForDate(date: Date): string {
+  const isProduction = process.env.NODE_ENV === "production";
+  const filePath = isProduction
+    ? path.join(__dirname, "../../src/words.json")
+    : path.join(__dirname, "../words.json");
+
+  const words = JSON.parse(fs.readFileSync(filePath, "utf-8")).words;
+  const index =
+    (date.getFullYear() * 366 + date.getMonth() * 31 + date.getDate()) %
+    words.length;
+  return words[index];
+}
+
+function getYesterdayWord(): string {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return getWordForDate(yesterday);
+}
+
+function getTomorrowWord(): string {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return getWordForDate(tomorrow);
+}
+
 function updateCurrentWord() {
   currentWord = selectWordForToday();
+  const yesterdayWord = getYesterdayWord();
+  const tomorrowWord = getTomorrowWord();
   console.log(`Word updated to: ${currentWord}`);
+  console.log(`Yesterday's word was: ${yesterdayWord}`);
+  console.log(`Tomorrow's word will be: ${tomorrowWord}`);
 }
 
 updateCurrentWord();
@@ -51,10 +80,10 @@ export const askQuestion = async (
         messages: [
           {
             role: "system",
-            content: `You are a helpful word guessing game assistant. The user is trying narrow down the mystery word by asking yes or no questions.
-                      Respond only with "Yes." or "No." except in the following cases. In the case there are ambiguities in the answer to the user's question, such as due to unknown variables,
-                      please respond with either a short sentence clarifying any assumptions in your answer, or "I'm not sure.". Do not include the actual word in this response, and use generic 
-                      terms to avoid giving away additional clues. In the case the user does not ask a yes or no question, please respond with "You can only ask Yes or No questions.". 
+            content: `You are a helpful word guessing game assistant. The player is trying narrow down the mystery word by asking yes or no questions.
+                      If the user does not ask a yes or no question, please respond with "You can only ask Yes or No questions.". 
+                      Otherwise, respond to the player with "Yes." or "No.", along with any additional context in case there are ambiguities in the answer to the user's question, such as due to unknown variables.
+                      Avoid including the actual word in your response, and use generic terms to avoid giving away additional clues.
                       The mystery word is ${currentWord}.`,
           },
           { role: "user", content: question },
