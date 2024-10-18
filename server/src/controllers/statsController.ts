@@ -17,7 +17,7 @@ export const updateUserStats = async (req: any, res: any) => {
       const todayCompletionCheck = await client.query(
         `SELECT * FROM completions 
          WHERE user_id = $1 
-         AND DATE(date AT TIME ZONE 'UTC') = CURRENT_DATE AT TIME ZONE 'UTC'`,
+         AND DATE(date) = CURRENT_DATE`,
         [user_id]
       );
 
@@ -30,16 +30,16 @@ export const updateUserStats = async (req: any, res: any) => {
 
         await client.query(
           `INSERT INTO stats (user_id, wins, streak, last_played)
-           VALUES ($1, 1, 1, NOW() AT TIME ZONE 'UTC')
+           VALUES ($1, 1, 1, NOW())
            ON CONFLICT (user_id)
            DO UPDATE SET
              wins = stats.wins + 1,
              streak = CASE
-               WHEN DATE(stats.last_played AT TIME ZONE 'UTC') = (CURRENT_DATE AT TIME ZONE 'UTC' - INTERVAL '1 day')
+               WHEN DATE(stats.last_played) = (CURRENT_DATE - INTERVAL '1 day')
                THEN stats.streak + 1
                ELSE 1
              END,
-             last_played = NOW() AT TIME ZONE 'UTC'
+             last_played = NOW()
            RETURNING *`,
           [user_id]
         );
@@ -89,6 +89,41 @@ export const getUserStats = async (req: any, res: any) => {
     }
   } catch (err) {
     console.error("Error fetching user profile: ", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getTodayLeaderboard = async (req: any, res: any) => {
+  try {
+    const client = await pool.connect();
+
+    try {
+      const leaderboardQuery = `
+      SELECT 
+        u.username, 
+        u.profile_picture, 
+        c.guesses, 
+        c.time
+      FROM 
+        completions c
+      JOIN 
+        users u ON c.user_id = u.google_id
+      WHERE 
+        DATE(c.date) = CURRENT_DATE
+      ORDER BY 
+        c.guesses ASC, 
+        c.time ASC
+      LIMIT 30
+    `;
+
+      const result = await client.query(leaderboardQuery);
+
+      res.status(200).json(result.rows);
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    console.error("Error fetching leaderboard:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };

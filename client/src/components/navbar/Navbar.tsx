@@ -17,7 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Flame, Trophy, User, LogOut, ChevronDown, Target } from "lucide-react";
-import { Loader } from "..";
+import { Loader, Leaderboard } from "..";
 
 import "./Navbar.css";
 
@@ -178,41 +178,46 @@ function Navbar() {
                     <Loader />
                   ) : (
                     <div className="stats-container">
-                      <Card className="card-half">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                          <CardTitle className="card-title">Wins</CardTitle>
-                          <Trophy className="h-6 w-6 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                          <div className="stats-value">{stats?.wins || 0}</div>
-                        </CardContent>
-                      </Card>
+                      <div className="user-stats-container">
+                        <Card className="card-half">
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="card-title">Wins</CardTitle>
+                            <Trophy className="h-6 w-6 text-muted-foreground" />
+                          </CardHeader>
+                          <CardContent>
+                            <div className="stats-value">
+                              {stats?.wins || 0}
+                            </div>
+                          </CardContent>
+                        </Card>
 
-                      <Card className="card-half">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                          <CardTitle className="card-title">Streak</CardTitle>
-                          <Flame className="h-6 w-6 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                          <div className="stats-value">
-                            {stats?.streak || 0}
-                          </div>
-                        </CardContent>
-                      </Card>
+                        <Card className="card-half">
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="card-title">Streak</CardTitle>
+                            <Flame className="h-6 w-6 text-muted-foreground" />
+                          </CardHeader>
+                          <CardContent>
+                            <div className="stats-value">
+                              {stats?.streak || 0}
+                            </div>
+                          </CardContent>
+                        </Card>
 
-                      <Card className="card-half">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                          <CardTitle className="card-title">
-                            Max Streak
-                          </CardTitle>
-                          <Target className="h-6 w-6 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                          <div className="stats-value">
-                            {stats?.max_streak || 0}
-                          </div>
-                        </CardContent>
-                      </Card>
+                        <Card className="card-half">
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="card-title">
+                              Max Streak
+                            </CardTitle>
+                            <Target className="h-6 w-6 text-muted-foreground" />
+                          </CardHeader>
+                          <CardContent>
+                            <div className="stats-value">
+                              {stats?.max_streak || 0}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                      <Leaderboard />
                     </div>
                   )
                 ) : (
