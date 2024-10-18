@@ -19,8 +19,6 @@
 }
 
 .navbar-links-logo p {
-  color: var(--color-text);
-  font-family: var(--font-family);
   font-weight: 800;
   font-size: 32px;
   line-height: 33px;
@@ -30,8 +28,6 @@
 }
 
 .navbar-links-logo span {
-  color: var(--color-text);
-  font-family: var(--font-family);
   font-weight: 500;
   font-size: 24px;
   line-height: 33px;
@@ -43,8 +39,6 @@
 .navbar-links_container p,
 .navbar-sign p,
 .navbar-menu_container p {
-  color: var(--color-text);
-  font-family: var(--font-family);
   font-weight: 500;
   font-size: 24px;
   line-height: 25px;
@@ -78,8 +72,6 @@
 }
 
 .navbar-profile p {
-  color: var(--color-text);
-  font-family: var(--font-family);
   font-weight: 500;
   font-size: 24px;
   line-height: 25px;

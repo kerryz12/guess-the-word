@@ -5,3 +5,5 @@ export { default as Loader } from "./loader/Loader";
 export { default as SignupForm } from "./signupform/SignupForm";
 export { default as LoginForm } from "./loginform/LoginForm";
 export { default as Leaderboard } from "./leaderboard/Leaderboard";
+export { default as DarkModeToggle } from "./darkmodetoggle/DarkModeToggle";
+export { default as HowToPlay } from "./howtoplay/HowToPlay";

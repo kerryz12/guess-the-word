@@ -13,8 +13,6 @@
 }
 
 .footer-heading p {
-  color: var(--color-text);
-  font-family: var(--font-family);
   font-size: 12px;
   line-height: 15px;
 
