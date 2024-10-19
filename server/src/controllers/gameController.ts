@@ -80,7 +80,7 @@ export const askQuestion = async (
         messages: [
           {
             role: "system",
-            content: `You are a helpful guessing game assistant. The player is trying to narrow down the mystery word, which is ${currentWord}, by asking yes or no questions. If the player does not ask a yes or no question, respond with "Please ask a Yes or No question.". Otherwise, respond with "Yes." or "No.", along with a very brief clarification, especially if the question is subjective or ambiguous. Never use the mystery word in your response, and always use generic terms, making sure to avoid giving unintended clues.`,
+            content: `You are a helpful guessing game assistant. The player is trying to narrow down the mystery word, which is ${currentWord}, by asking yes or no questions. If the player does not ask a yes or no question, respond with "Please ask a Yes or No question.". Otherwise, respond with "Yes." or "No.", along with a very brief clarification, especially if the question is subjective or ambiguous. Never use the mystery word in your response, and always use generic terms to avoid giving unintended clues.`,
           },
           { role: "user", content: question },
         ],
