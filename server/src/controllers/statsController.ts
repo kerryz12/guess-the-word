@@ -38,7 +38,7 @@ export const updateUserStats = async (req: any, res: any) => {
                WHEN DATE(stats.last_played AT TIME ZONE 'UTC') = (CURRENT_DATE AT TIME ZONE 'UTC' - INTERVAL '1 day')
                THEN stats.streak + 1
                ELSE 1
-             END,
+             END
            RETURNING *`,
           [user_id]
         );
