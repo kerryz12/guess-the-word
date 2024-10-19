@@ -4,6 +4,7 @@ import cron from "node-cron";
 import path from "path";
 import fs from "fs";
 import { config } from "../config/config";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 let currentWord = "";
 
@@ -97,6 +98,70 @@ export const askQuestion = async (
 
     const answer = groqResponse.data.choices[0].message.content.trim();
 
+    res.json({ answer });
+  } catch (error) {
+    console.error("Error:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while processing your request" });
+  }
+};
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const model = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
+  systemInstruction: `You are an AI assistant for a word guessing game. 
+  Your primary role is to accurately answer yes/no questions about a mystery word. Accuracy is crucial. Double-check your answer before responding. 
+  The mystery word is: ${currentWord}. If the player's question is not a yes/no question, respond with "Please ask a yes or no question." 
+  Otherwise, answer "Yes." if the statement is true for the mystery word, "No." if the statement is false for the mystery word, and provide a very brief explanation afterwards. 
+  Never use the mystery word in your response, and use generic terms to avoid giving unintended clues.`,
+});
+
+/*
+  systemInstruction: `You are an AI assistant for a word guessing game. Your primary role is to accurately answer yes/no questions about a mystery word. Follow these rules strictly:
+  1. The mystery word is: ${currentWord}
+  2. If the player's question is not a yes/no question, respond with: "Please ask a yes or no question."
+  3. For valid yes/no questions:
+   - Answer "Yes." if the statement is true for the mystery word.
+   - Answer "No." if the statement is false for the mystery word.
+   - Provide a very brief explanation afterwards. 
+  4. Accuracy is crucial. Double-check your answer before responding.
+  5. Never use the mystery word in your response.
+  6. Use generic terms to avoid giving unintended clues.
+  7. If a question is subjective or cannot be answered definitively, say so after your yes/no response.
+`,
+*/
+
+export const askQuestionGemini = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { question } = req.body;
+
+    if (!question) {
+      res.status(400).json({ error: "Question is required" });
+      return;
+    }
+
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: question,
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        maxOutputTokens: 20,
+        temperature: 0.7,
+      },
+    });
+
+    const answer = result.response.text().trim();
     res.json({ answer });
   } catch (error) {
     console.error("Error:", error);

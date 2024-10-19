@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Confetti from "react-confetti";
 import { Loader } from "..";
@@ -27,6 +28,7 @@ const Game = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingReply, setLoadingReply] = useState(false);
   const [serverDate, setServerDate] = useState("");
+  const [isGemini, setIsGemini] = useState(false);
 
   const fetchServerDateTime = async () => {
     try {
@@ -119,11 +121,16 @@ const Game = () => {
     return () => clearInterval(timer);
   }, [isGameOver, isLoading]);
 
+  const handleToggle = (checked: boolean) => {
+    setIsGemini(checked);
+  };
+
   const handleQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoadingReply(true);
+    const endpoint = isGemini ? "/api/game/askGemini" : "/api/game/ask";
     try {
-      const response = await fetch("/api/game/ask", {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -272,8 +279,16 @@ const Game = () => {
       </Card>
 
       <Card className="my-6">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="card-title">Ask Questions</CardTitle>
+          <div className="flex items-center space-x-2">
+            <span>{isGemini ? "Gemini" : "Llama"}</span>
+            <Switch
+              id="gemini-switch"
+              checked={isGemini}
+              onCheckedChange={handleToggle}
+            />
+          </div>
         </CardHeader>
         <CardContent className="card-content">
           {loadingReply ? <Loader /> : <p>{answer}</p>}
