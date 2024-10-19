@@ -39,8 +39,14 @@ export const updateUserStats = async (req: any, res: any) => {
                THEN stats.streak + 1
                ELSE 1
              END,
-             last_played = NOW() AT TIME ZONE 'UTC'
            RETURNING *`,
+          [user_id]
+        );
+
+        await client.query(
+          `UPDATE stats
+           SET last_played = NOW() AT TIME ZONE 'UTC'
+           WHERE user_id = $1`,
           [user_id]
         );
 

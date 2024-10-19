@@ -28,7 +28,8 @@ CREATE TABLE public.completions (
     user_id character varying(255),
     guesses integer,
     "time" interval,
-    date timestamp without time zone DEFAULT now()
+    date timestamp without time zone DEFAULT now(),
+    id integer NOT NULL
 );
 
 
@@ -56,7 +57,8 @@ CREATE TABLE public.stats (
     wins integer,
     streak integer,
     max_streak integer,
-    last_played timestamp without time zone
+    last_played timestamp without time zone,
+    id integer NOT NULL
 );
 
 
@@ -111,11 +113,27 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
+-- Name: completions completions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.completions
+    ADD CONSTRAINT completions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: session session_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.session
     ADD CONSTRAINT session_pkey PRIMARY KEY (sid);
+
+
+--
+-- Name: stats stats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stats
+    ADD CONSTRAINT stats_pkey PRIMARY KEY (id);
 
 
 --
