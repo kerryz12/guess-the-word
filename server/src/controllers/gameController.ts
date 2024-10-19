@@ -85,7 +85,7 @@ export const askQuestion = async (
           { role: "user", content: question },
         ],
         max_tokens: 20,
-        temperature: 0.7,
+        temperature: 0.5,
       },
       {
         headers: {
