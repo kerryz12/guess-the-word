@@ -282,7 +282,7 @@ const Game = () => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="card-title">Ask Questions</CardTitle>
           <div className="flex items-center space-x-2">
-            <span>{isGemini ? "Gemini" : "Llama"}</span>
+            <span>{isGemini ? "Asking Gemini" : "Asking Llama"}</span>
             <Switch
               id="gemini-switch"
               checked={isGemini}

@@ -74,6 +74,15 @@ export const askQuestion = async (
       return;
     }
 
+    let questionArray = question.split(" ");
+    let questionSet = new Set(questionArray);
+    const bannedWords = ["ignore", "previous", "instructions", "prompts"];
+
+    if (bannedWords.some((bannedWord) => questionSet.has(bannedWord))) {
+      res.json({ answer: "Your question had one or more banned words." });
+      return;
+    }
+
     const groqResponse = await axios.post(
       config.groqApiUrl,
       {
@@ -156,7 +165,7 @@ export const askQuestionGemini = async (
         },
       ],
       generationConfig: {
-        maxOutputTokens: 20,
+        maxOutputTokens: 30,
         temperature: 0.7,
       },
     });
