@@ -211,10 +211,9 @@ function Navbar() {
       {isAuthenticated && (
         <div className="navbar-profile">
           <DropdownMenu>
-            <img src={profilePicture} alt="profile" />
             <DropdownMenuTrigger asChild>
               <div className="navbar-profile-name">
-                <p>{displayName}</p>
+                <img src={profilePicture} alt={displayName} />
                 <ChevronDown />
               </div>
             </DropdownMenuTrigger>
@@ -222,7 +221,7 @@ function Navbar() {
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() => redirectUser("/user/" + displayName)}
+                  onClick={() => redirectUser("profile")}
                 >
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>

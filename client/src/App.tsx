@@ -7,6 +7,7 @@ import { DarkModeProvider } from "./components/darkmodetoggle/DarkModeContext";
 import HomePage from "./pages/home/HomePage";
 import LoginPage from "./pages/loginpage/LoginPage";
 import SignupPage from "./pages/signuppage/SignupPage";
+import ProfilePage from "./pages/profilepage/ProfilePage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Routes>
           <DarkModeToggle />
           <Footer />
