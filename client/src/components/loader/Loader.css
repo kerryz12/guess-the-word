@@ -9,7 +9,6 @@
 .loader__icon {
   width: 1.5rem;
   height: 1.5rem;
-  color: var(--color-text);
   animation: spin 1s linear infinite;
 }
 
@@ -17,7 +16,6 @@
   margin-left: 0.5rem;
   font-size: 1rem;
   font-weight: 500;
-  color: var(--color-text);
   font-family: var(--font-family);
 }
 

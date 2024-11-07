@@ -1,35 +1,27 @@
 import { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Flame, Trophy, User, LogOut, ChevronDown, Target } from "lucide-react";
-import { Loader, Leaderboard, HowToPlay } from "..";
+import { User, LogOut, ChevronDown } from "lucide-react";
+import { HowToPlay, Stats } from "..";
 
 import "./Navbar.css";
 
-interface UserStats {
-  wins: number;
-  streak: number;
-  max_streak: number;
+interface StoredDateInfo {
+  formattedDate: string;
+  serverTimestamp: string;
 }
 
 function Navbar() {
-  const [stats, setStats] = useState<UserStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [currentDate, setCurrentDate] = useState("");
+  const [currentDate, setCurrentDate] = useState(() => {
+    const storedDateInfo = localStorage.getItem("dateInfo");
+    return storedDateInfo ? JSON.parse(storedDateInfo).formattedDate : "";
+  });
+
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem("isAuthenticated") === "true";
   });
@@ -41,6 +33,14 @@ function Navbar() {
   const [profilePicture, setProfilePicture] = useState<string>(() => {
     return localStorage.getItem("profilePicture") || "";
   });
+
+  const formatDate = (date: Date): string => {
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   const checkAuthStatus = async () => {
     try {
@@ -67,6 +67,54 @@ function Navbar() {
     }
   };
 
+  const fetchAndUpdateDate = async () => {
+    try {
+      const response = await fetch("/api/game/datetime", {
+        credentials: "include",
+      });
+      const data = await response.json();
+      const serverDate = new Date(data.currentDate);
+      const formattedDate = formatDate(serverDate);
+
+      const dateInfo: StoredDateInfo = {
+        formattedDate,
+        serverTimestamp: data.currentDate,
+      };
+
+      setCurrentDate(formattedDate);
+      localStorage.setItem("dateInfo", JSON.stringify(dateInfo));
+    } catch (error) {
+      console.error("Error fetching date:", error);
+    }
+  };
+
+  const shouldCheckDate = async (): Promise<boolean> => {
+    const storedDateInfo = localStorage.getItem("dateInfo");
+    if (!storedDateInfo) return true;
+
+    try {
+      const { serverTimestamp } = JSON.parse(storedDateInfo) as StoredDateInfo;
+      if (!serverTimestamp) return true;
+
+      const response = await fetch("/api/game/datetime", {
+        credentials: "include",
+      });
+      const { currentDate: newServerDate } = await response.json();
+
+      const oldDate = new Date(serverTimestamp);
+      const newDate = new Date(newServerDate);
+
+      return (
+        oldDate.getDate() !== newDate.getDate() ||
+        oldDate.getMonth() !== newDate.getMonth() ||
+        oldDate.getFullYear() !== newDate.getFullYear()
+      );
+    } catch (error) {
+      console.error("Error checking date:", error);
+      return true;
+    }
+  };
+
   const redirectUser = (url: string) => {
     location.href = url;
   };
@@ -76,57 +124,15 @@ function Navbar() {
   }, []);
 
   useEffect(() => {
-    const fetchDate = async () => {
-      try {
-        const response = await fetch("/api/game/datetime", {
-          credentials: "include",
-        });
-        const data = await response.json();
-
-        const formattedDate = new Date(data.currentDate).toLocaleDateString(
-          "en-US",
-          {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          }
-        );
-
-        setCurrentDate(formattedDate);
-      } catch (error) {
-        console.error("Error fetching date:", error);
+    const initializeDate = async () => {
+      const needsUpdate = await shouldCheckDate();
+      if (!currentDate || needsUpdate) {
+        fetchAndUpdateDate();
       }
     };
 
-    fetchDate();
+    initializeDate();
   }, []);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      if (!isAuthenticated) {
-        setStats(null);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch("/api/stats/user", {
-          credentials: "include",
-        });
-        if (!response.ok) {
-          throw new Error("Failed to fetch user stats");
-        }
-        const data = await response.json();
-        setStats(data.stats);
-        setLoading(false);
-      } catch (err) {
-        setLoading(false);
-        throw new Error("Failed to fetch user stats");
-      }
-    };
-
-    fetchStats();
-  }, [isAuthenticated]);
 
   return (
     <div className="navbar">
@@ -140,68 +146,7 @@ function Navbar() {
       </div>
       <div className="navbar-links_container">
         <HowToPlay />
-        <Dialog>
-          <DialogTrigger>
-            <p>stats</p>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="text-xl">Stats</DialogTitle>
-              <DialogDescription className="text-lg">
-                {isAuthenticated ? (
-                  loading ? (
-                    <Loader />
-                  ) : (
-                    <div className="stats-container">
-                      <div className="user-stats-container">
-                        <Card className="card-half">
-                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="card-title">Wins</CardTitle>
-                            <Trophy className="h-6 w-6 text-muted-foreground" />
-                          </CardHeader>
-                          <CardContent>
-                            <div className="stats-value">
-                              {stats?.wins || 0}
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="card-half">
-                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="card-title">Streak</CardTitle>
-                            <Flame className="h-6 w-6 text-muted-foreground" />
-                          </CardHeader>
-                          <CardContent>
-                            <div className="stats-value">
-                              {stats?.streak || 0}
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="card-half">
-                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="card-title">
-                              Max Streak
-                            </CardTitle>
-                            <Target className="h-6 w-6 text-muted-foreground" />
-                          </CardHeader>
-                          <CardContent>
-                            <div className="stats-value">
-                              {stats?.max_streak || 0}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                      <Leaderboard />
-                    </div>
-                  )
-                ) : (
-                  <p>Log in to see your stats!</p>
-                )}
-              </DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
+        <Stats isAuthenticated={isAuthenticated} />
         {!isAuthenticated && (
           <p>
             <a href="/login">login</a>

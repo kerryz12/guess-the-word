@@ -7,3 +7,4 @@ export { default as LoginForm } from "./loginform/LoginForm";
 export { default as Leaderboard } from "./leaderboard/Leaderboard";
 export { default as DarkModeToggle } from "./darkmodetoggle/DarkModeToggle";
 export { default as HowToPlay } from "./howtoplay/HowToPlay";
+export { default as Stats } from "./stats/Stats";
