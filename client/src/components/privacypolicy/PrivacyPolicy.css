@@ -1,0 +1,20 @@
+.privacy-trigger {
+  margin-top: 1rem;
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.privacy-dialog-content {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.privacy-description p {
+  font-size: 16px;
+  margin-bottom: 1rem;
+}
+
+.privacy-description p:last-child {
+  margin-bottom: 0;
+}
