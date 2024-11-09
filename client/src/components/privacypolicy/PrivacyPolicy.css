@@ -3,6 +3,9 @@
   display: inline-block;
   cursor: pointer;
   text-decoration: underline;
+
+  font-size: 12px;
+  line-height: 15px;
 }
 
 .privacy-dialog-content {
