@@ -5,6 +5,8 @@ import {
   MessageSquare,
   Send,
   MessageCircleQuestion,
+  Lightbulb,
+  X,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,7 @@ const Game = () => {
   const [loadingReply, setLoadingReply] = useState(false);
   const [serverDate, setServerDate] = useState("");
   const [isGemini, setIsGemini] = useState(false);
+  const [showGuessInput, setShowGuessInput] = useState(false);
 
   const fetchServerDateTime = async () => {
     try {
@@ -55,6 +58,7 @@ const Game = () => {
     setIsGameOver(false);
     setSolvedWord("");
     setAnswer("");
+    setShowGuessInput(false);
     localStorage.removeItem("gameState");
   }, []);
 
@@ -66,9 +70,10 @@ const Game = () => {
       solvedWord,
       savedDate: serverDate,
       lastSolvedDate: serverDate,
+      showGuessInput,
     };
     localStorage.setItem("gameState", JSON.stringify(gameState));
-  }, [guesses, time, isGameOver, solvedWord]);
+  }, [guesses, time, isGameOver, solvedWord, showGuessInput]);
 
   const loadGameState = useCallback(async () => {
     const gameState = localStorage.getItem("gameState");
@@ -76,8 +81,14 @@ const Game = () => {
     setServerDate(currentDate);
 
     if (gameState) {
-      const { guesses, time, isGameOver, solvedWord, savedDate } =
-        JSON.parse(gameState);
+      const {
+        guesses,
+        time,
+        isGameOver,
+        solvedWord,
+        savedDate,
+        showGuessInput,
+      } = JSON.parse(gameState);
 
       const today = new Date(currentDate);
       const yesterday = new Date(currentDate);
@@ -92,6 +103,7 @@ const Game = () => {
         setTime(time);
         setIsGameOver(isGameOver);
         setSolvedWord(solvedWord);
+        setShowGuessInput(showGuessInput || false);
       }
     }
 
@@ -179,7 +191,7 @@ const Game = () => {
       setGuesses((prevGuesses) => prevGuesses + 1);
     } catch (error) {
       console.error("Error:", error);
-      setAnswer("An error occurred while processing your guess");
+      setAnswer("An error occurred while processing your guess.");
     }
   };
 
@@ -216,6 +228,10 @@ const Game = () => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+  };
+
+  const toggleGuessInput = () => {
+    setShowGuessInput((prev) => !prev);
   };
 
   return (
@@ -257,28 +273,57 @@ const Game = () => {
               color: isGameOver ? "green" : "",
             }}
           >
-            {isGameOver ? solvedWord : guess || "?"}
+            {isGameOver ? solvedWord : "?"}
           </div>
-          <form onSubmit={handleGuessSubmit} className="form-container mt-4">
-            <div className="guess-word-container">
-              <Input
-                type="text"
-                value={guess}
-                onChange={(e) => setGuess(e.target.value)}
-                placeholder="Guess the word..."
-                className="input-field"
-                disabled={isGameOver}
-                maxLength={16}
-              />
-              <Button type="submit" className="button" disabled={isGameOver}>
-                Guess <Send className="ml-2 h-5 w-5" />
-              </Button>
+
+          {!isGameOver && (
+            <div className="mt-4 flex justify-center">
+              {!showGuessInput ? (
+                <Button
+                  onClick={toggleGuessInput}
+                  variant="outline"
+                  className="make-guess-button"
+                >
+                  <Lightbulb className="mr-2 h-5 w-5" />
+                  Make a Guess
+                </Button>
+              ) : (
+                <div className="guess-input-container">
+                  <form
+                    onSubmit={handleGuessSubmit}
+                    className="form-container mt-4 w-full"
+                  >
+                    <div className="guess-word-container">
+                      <Input
+                        type="text"
+                        value={guess}
+                        onChange={(e) => setGuess(e.target.value)}
+                        placeholder="Guess the word..."
+                        className="input-field"
+                        maxLength={16}
+                        autoFocus
+                      />
+                      <Button type="submit" className="button">
+                        Guess <Send className="ml-2 h-5 w-5" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={toggleGuessInput}
+                        className="button-close"
+                      >
+                        <X className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </div>
-          </form>
+          )}
         </CardContent>
       </Card>
 
-      <Card className="my-6">
+      <Card className="my-0">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="card-title">Ask Questions</CardTitle>
           <div className="flex items-center space-x-2">
