@@ -118,7 +118,7 @@ export const askQuestion = async (
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: "gemini-2.0-flash",
   systemInstruction: `You are an AI assistant for a word guessing game. 
   Your primary role is to accurately answer yes/no questions about a mystery word. Accuracy is crucial. Double-check your answer before responding. 
   The mystery word is: ${currentWord}. If the player's question is not a yes/no question, respond with "Please ask a yes or no question." 
