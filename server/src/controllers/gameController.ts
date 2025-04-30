@@ -86,7 +86,7 @@ export const askQuestion = async (
     const groqResponse = await axios.post(
       config.groqApiUrl,
       {
-        model: "llama3-70b-8192",
+        model: "llama-3.3-70b-versatile",
         messages: [
           {
             role: "system",
