@@ -124,8 +124,8 @@ export const askQuestion = async (
           },
         ],
 
-        max_completion_tokens: 20,
-        temperature: 0,
+        max_completion_tokens: 128,
+        temperature: 0.7,
         reasoning_effort: "low",
       },
       {
