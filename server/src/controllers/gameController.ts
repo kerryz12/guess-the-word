@@ -117,6 +117,11 @@ export const askQuestion = async (
       }
     );
 
+    console.log(
+      "GROQ FULL RESPONSE:",
+      JSON.stringify(groqResponse.data, null, 2)
+    );
+
     const answer = groqResponse.data.choices[0].message.content.trim();
 
     res.json({ answer });
