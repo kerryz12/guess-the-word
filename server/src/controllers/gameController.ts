@@ -76,8 +76,6 @@ export const askQuestion = async (
 
     const normalizedQuestion = question.trim();
 
-    // Optional input-level protection.
-    // This is NOT your primary security mechanism.
     const bannedWords = new Set([
       "ignore",
       "previous",
@@ -101,7 +99,6 @@ export const askQuestion = async (
       config.groqApiUrl,
       {
         model: "openai/gpt-oss-120b",
-
         messages: [
           {
             role: "system",
@@ -123,7 +120,6 @@ export const askQuestion = async (
             content: normalizedQuestion,
           },
         ],
-
         max_completion_tokens: 128,
         temperature: 0.7,
         reasoning_effort: "low",
@@ -137,10 +133,9 @@ export const askQuestion = async (
       }
     );
 
-    const rawAnswer =
-      groqResponse.data?.choices?.[0]?.message?.content?.trim();
+    const answer = groqResponse.data?.choices?.[0]?.message?.content?.trim();
 
-    if (!rawAnswer) {
+    if (!answer) {
       console.error("Groq returned an empty response:", groqResponse.data);
 
       res.status(502).json({
@@ -149,7 +144,7 @@ export const askQuestion = async (
       return;
     }
 
-    res.json({ rawAnswer });
+    res.json({ answer });
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("Groq API error:", {
